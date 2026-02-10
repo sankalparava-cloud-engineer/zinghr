@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>HR Portal</title>
+    <style>
+        body { font-family: Arial; max-width: 1000px; margin: 50px auto; padding: 20px; }
+        h1 { color: #333; }
+        form { background: #f4f4f4; padding: 20px; margin-bottom: 20px; }
+        input { margin: 5px; padding: 8px; width: 200px; }
+        button { padding: 8px 15px; background: #007bff; color: white; border: none; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background: #007bff; color: white; }
+        .delete-btn { background: #dc3545; padding: 5px 10px; }
+    </style>
+</head>
+<body>
+    <h1>HR Portal - Employee Management</h1>
+    
+    <form id="employeeForm">
+        <input type="text" id="name" placeholder="Name" required>
+        <input type="email" id="email" placeholder="Email" required>
+        <input type="text" id="department" placeholder="Department" required>
+        <input type="text" id="position" placeholder="Position" required>
+        <button type="submit">Add Employee</button>
+    </form>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Department</th>
+                <th>Position</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="employeeList"></tbody>
+    </table>
+
+    <script>
+        const API_URL = '/api';
+
+        async function loadEmployees() {
+            const res = await fetch(`${API_URL}/employees`);
+            const employees = await res.json();
+            document.getElementById('employeeList').innerHTML = employees.map(emp => `
+                <tr>
+                    <td>${emp.id}</td>
+                    <td>${emp.name}</td>
+                    <td>${emp.email}</td>
+                    <td>${emp.department}</td>
+                    <td>${emp.position}</td>
+                    <td><button class="delete-btn" onclick="deleteEmployee(${emp.id})">Delete</button></td>
+                </tr>
+            `).join('');
+        }
+
+        document.getElementById('employeeForm').onsubmit = async (e) => {
+            e.preventDefault();
+            await fetch(`${API_URL}/employees`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    name: document.getElementById('name').value,
+                    email: document.getElementById('email').value,
+                    department: document.getElementById('department').value,
+                    position: document.getElementById('position').value
+                })
+            });
+            e.target.reset();
+            loadEmployees();
+        };
+
+        async function deleteEmployee(id) {
+            await fetch(`${API_URL}/employees/${id}`, {method: 'DELETE'});
+            loadEmployees();
+        }
+
+        loadEmployees();
+    </script>
+</body>
+</html>
