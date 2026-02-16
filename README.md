@@ -2,7 +2,7 @@
 
 ## Architecture
 - **Frontend**: Static HTML
-- **Backend**: Python Flask REST API
+- **Backend**: Python Flask Gunicorn
 - **Database**: SQLite
 
 ## Setup
